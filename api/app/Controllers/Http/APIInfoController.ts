@@ -1,103 +1,89 @@
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Env from '@ioc:Adonis/Core/Env'
-import Route, { RouteNode } from '@ioc:Adonis/Core/Route'
-import { flatten } from '@poppinss/utils'
 import pkg from '../../../package.json'
 
-interface APIInfo {
-    api: {
-        name: string,
-        version: string,
-        environment: string
-    },
-    network: {
-        host: string,
-        port: number
-    },
-    license: {
-        name: string,
-        url: string
-    },
-    contact: {
-        github: string
-    },
-    routes: {
-        [domain: string]: (RouteNode & {
-            methods: string[];
-        })[];
-    },
-    flattened: Record<string, any>
-}
+import Env from '@ioc:Adonis/Core/Env'
+import Route from '@ioc:Adonis/Core/Route'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class APIInfoController {
-    public async handle({ request }: HttpContextContract) {
-        /**
-         * API info
-         */
-        // Name
-        const name = pkg.name;
+import { flatten } from '@poppinss/utils'
 
-        // Version
-        const version = pkg.version;
-
-        // Environment
-        const environment = Env.get('NODE_ENV');
+import type { APIInfoResponse } from 'types/APIInfo/APIInfoResponse'
+import type { APIState } from 'types/APIInfo/Info/APIState'
+import type { APINetwork } from 'types/APIInfo/Info/APINetwork'
+import type { APILicense } from 'types/APIInfo/Info/APILicense'
+import type { APIContact } from 'types/APIInfo/Info/APIContact'
 
 
-        /**
-         * Network info
-         */
-        // Host
-        const host = Env.get('HOST');
+export default class APIInfoController
+{
+    public async handle({ request }: HttpContextContract)
+    {
+        // Get API info
+        const info: APIInfoResponse = this.getAPIInfo();
 
-        // Port
-        const port = Env.get('PORT');
-
-
-        /**
-         * Response
-         */
-        const info: APIInfo = {
-            // API Info
-            api: {
-                name,
-                version,
-                environment
-            },
-            // Network Info
-            network: {
-                host,
-                port
-            },
-            // License Info
-            license: {
-                name: 'MIT',
-                url: 'https://opensource.org/license/mit'
-            },
-            // Contact Info
-            contact: {
-                github: 'https://github.com/callumndev'
-            },
-            // Routes
-            routes: Route.toJSON(),
-            // Flattened
-            flattened: {}
-        };
-
-        // Flatten the APIInfo object
-        info.flattened = flatten(info, '.', true);
-
-        // If request has a 'key' in the query string, return that key's value from the flattened APIInfo object
-        // Otherwise, return the entire APIInfo object
-        const query = request.qs();
-        const key = query['key'];
-        if (key) {
-            if (Object.hasOwnProperty.call(info.flattened, key)) {
-                return info.flattened[key];
-            }
+        // If request has a 'key' in the query string, return that key's value from the flattened APIInfoResponse object
+        // Otherwise, return the entire APIInfoResponse object
+        const infoKey = request.qs()['key'];
+        if (infoKey)
+        {
+            if (Object.hasOwnProperty.call(info.flattened, infoKey))
+                return info.flattened[infoKey];
         }
 
-        // Return the entire APIInfo object
+        // Return the entire APIInfoResponse object
         return info;
+    }
+
+
+    private getAPIInfo(): APIInfoResponse
+    {
+        const info: APIInfoResponse = {
+            state: this.getAPIState(),
+            network: this.getAPINetwork(),
+            license: this.getAPILicense(),
+            contact: this.getAPIContact(),
+            routes: Route.toJSON(),
+
+            // Flattened APIInfo
+            flattened: {}
+        }
+
+        // Flatten the APIInfoResponse object
+        info.flattened = flatten(info, '.', true);
+
+        // Return the APIInfoResponse object
+        return info;
+    }
+
+
+    private getAPIState(): APIState
+    {
+        return {
+            name: pkg.name,
+            version: pkg.version,
+            environment: Env.get('NODE_ENV')
+        }
+    }
+
+    private getAPINetwork(): APINetwork
+    {
+        return {
+            host: Env.get('HOST'),
+            port: Env.get('PORT')
+        }
+    }
+
+    private getAPILicense(): APILicense
+    {
+        return {
+            name: 'MIT',
+            url: 'https://opensource.org/license/mit'
+        }
+    }
+
+    private getAPIContact(): APIContact
+    {
+        return {
+            github: 'https://github.com/callumndev'
+        }
     }
 }
