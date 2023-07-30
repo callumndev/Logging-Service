@@ -1,5 +1,7 @@
 import pkg from '../../../package.json'
 
+import InvalidQueryStringValueForKeyException from 'App/Exceptions/InvalidQueryStringValueForKeyException'
+
 import Env from '@ioc:Adonis/Core/Env'
 import Route from '@ioc:Adonis/Core/Route'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
@@ -27,6 +29,8 @@ export default class APIInfoController
         {
             if (Object.hasOwnProperty.call(info.flattened, infoKey))
                 return info.flattened[infoKey];
+            else
+                throw new InvalidQueryStringValueForKeyException('key', infoKey);
         }
 
         // Return the entire APIInfoResponse object
