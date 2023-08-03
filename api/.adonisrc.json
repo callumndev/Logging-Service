@@ -3,8 +3,7 @@
     "commands": [
         "./commands",
         "@adonisjs/core/build/commands/index.js",
-        "@adonisjs/repl/build/commands",
-        "@wahyubucil/adonis-prisma/build/commands"
+        "@adonisjs/repl/build/commands"
     ],
     "exceptionHandlerNamespace": "App/Exceptions/Handler",
     "aliases": {
@@ -19,8 +18,7 @@
     ],
     "providers": [
         "./providers/AppProvider",
-        "@adonisjs/core",
-        "@wahyubucil/adonis-prisma"
+        "@adonisjs/core"
     ],
     "aceProviders": [
         "@adonisjs/repl"

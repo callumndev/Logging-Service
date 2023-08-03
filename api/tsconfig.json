@@ -28,8 +28,7 @@
         "types": [
             "@adonisjs/core",
             "@adonisjs/repl",
-            "@japa/preset-adonis/build/adonis-typings",
-            "@wahyubucil/adonis-prisma"
+            "@japa/preset-adonis/build/adonis-typings"
         ],
         "resolveJsonModule": true
     }
